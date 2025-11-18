@@ -385,14 +385,9 @@ Port then:
   
 - `query_params`: Query parameters to send with the request (e.g., `limit: "100"`).
 
-**Additional Ocean Custom configurations** (not used in this example):
+**Additional Ocean Custom configurations:**
 
-- **Basic Authentication**: Use `authType=basic` with `username` and `password` instead of bearer token
-- **API Key Authentication**: Use `authType=api_key` with `apiKey` and optional `apiKeyHeader` (defaults to `X-API-Key`)
-- **Offset Pagination**: Use `paginationType=offset` with `offsetParam` and `limitParam` for APIs that use offset/limit
-- **Page Pagination**: Use `paginationType=page` with `pageParam` and `sizeParam` for APIs that use page numbers
-- **Dynamic Path Parameters**: Use dynamic endpoints to query APIs and discover parameter values for nested endpoints
-- **Custom Headers**: Add custom headers via `headers` in the resource mapping selector
+For advanced configurations like Basic Auth, API Key Auth, Offset/Page Pagination, Dynamic Path Parameters, and Custom Headers, see the [Ocean Custom Integration documentation](https://docs.port.io/build-your-software-catalog/custom-integration/ocean-custom-integration/overview).
 
 **Save and Sync:**
 
@@ -406,15 +401,7 @@ Port then:
 
 ## 6. Verify the Integration
 
-**Check Entities in Port:**
-
-1. Go to **"Software Catalog"** → **"Entities"**
-2. Filter by your blueprints (e.g., `ocean_slackUser`, `ocean_slackChannel`)
-3. You should see entities synced from Slack
-
-**Check Integration Status:**
-
-Go to **Port UI → Data Sources → slack-integration** to see the integration status and sync information.
+Go to Port's catalog and check if data is synced in. You should see Slack users and channels appearing as entities.
 
 ---
 
