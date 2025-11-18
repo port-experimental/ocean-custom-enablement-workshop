@@ -1,45 +1,71 @@
 # Ocean Custom Integration Workshop
 
-Workshop materials for Port SEs and TSMs to learn how to integrate any tool using Ocean Custom Integration.
+Hands-on workshop materials for Port SEs and TSMs to learn how to integrate any tool using Ocean Custom Integration.
 
-## Workshop Goals
+## 🎯 Workshop Goals
 
-By the end of this workshop, each SE will be able to integrate with any tool during a POC.
+By the end of this workshop, each SE will be able to integrate with any tool during a POC using Ocean Custom Integration.
 
-## Workshop Structure
+## 📚 Workshop Structure
 
-Each integration follows a standardized format with step-by-step instructions:
+This workshop consists of **hands-on exercises** where you'll build real integrations step-by-step.
+
+### Each Exercise Includes:
 
 1. **Use Case** - What problem does this integration solve?
 2. **Tool Overview** - Which tool will you integrate?
 3. **Prerequisites** - Port credentials and K8s cluster access
-4. **Blueprints** - JSON blocks to create in Port
-5. **Installation** - Helm install commands
-6. **Mapping Configuration** - How to add the resource mapping
-7. **Bonus Task** - Add a new kind to the mapping
+4. **Installation** - Helm install commands (copy-paste ready)
+5. **Blueprints** - JSON blocks to create in Port
+6. **Resource Mapping** - How to map API data to Port entities
+7. **Bonus Task** - Add a new endpoint to the mapping
 
-## Available Integrations
+## 🏋️ Available Exercises
 
-- ✅ **Slack** - Ready
-- ✅ **Zendesk** - Ready
-- 🚧 **Incident.io** - In progress
-- 🚧 **Notion** - In progress
-- 🚧 **Rootly** - In progress
+Each exercise is a complete, self-contained integration lab:
 
-## Workshop Format
+- ✅ **Exercise 1: Slack** - Ready to start
+- 🚧 **Exercise 2: Zendesk** - Coming soon
+- 🚧 **Exercise 3: Incident.io** - Coming soon
+- 🚧 **Exercise 4: Notion** - Coming soon
+- 🚧 **Exercise 5: Rootly** - Coming soon
+
+## 🚀 Getting Started
+
+1. **Choose an exercise** from the `exercises/` folder
+2. **Open the README.md** in that exercise folder
+3. **Follow step-by-step** - all commands are copy-paste ready
+4. **Ask questions** in the workshop Slack channel if you get stuck
+
+## 📋 Workshop Details
 
 - **Duration**: 1 hour
-- **Format**: Virtual, parallel execution
-- **Prerequisites**: Comfortable with YAML and kubectl (copy-paste friendly)
+- **Format**: Virtual, parallel execution (each SE works independently)
+- **Prerequisites**: 
+  - Comfortable with YAML and kubectl
+  - MacOS (all commands are Mac-specific)
+  - AWS SSO access (credentials provided)
 
-## Getting Started
+## 📁 Repository Structure
 
-1. Navigate to the integration folder you want to work with
-2. Follow the README.md step-by-step
-3. All commands are copy-paste ready
-4. Ask questions in the workshop Slack channel
+```
+├── exercises/          # Hands-on integration exercises
+│   ├── slack/         # Exercise 1: Slack integration
+│   ├── zendesk/       # Exercise 2: Zendesk integration
+│   └── ...
+├── templates/         # Templates for creating new exercises
+├── docs/              # Reference materials and notes
+└── README.md          # This file
+```
 
-## Support
+## 💡 Tips
+
+- All commands are **copy-paste ready** - no manual editing needed
+- Each exercise is **independent** - start with any one
+- **Checkpoints** are marked throughout - verify your progress
+- If stuck, check the **Troubleshooting** section in each exercise
+
+## 🆘 Support
 
 For questions or issues during the workshop, reach out to the workshop facilitators.
 
