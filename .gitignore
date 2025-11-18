@@ -1,0 +1,23 @@
+# Secrets and sensitive data
+SECRETS.md
+*.secret
+*.key
+
+# External repos (reference only, not needed in workshop repo)
+port-docs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.log
+*.tmp
+
