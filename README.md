@@ -24,11 +24,14 @@ This workshop consists of **hands-on exercises** where you'll build real integra
 
 Each exercise is a complete, self-contained integration lab:
 
-- ✅ **Exercise 1: Slack** - Ready to start
-- 🚧 **Exercise 2: Zendesk** - Coming soon
-- 🚧 **Exercise 3: Incident.io** - Coming soon
-- 🚧 **Exercise 4: Notion** - Coming soon
-- 🚧 **Exercise 5: Rootly** - Coming soon
+- ✅ **Exercise 1: Slack** - Bearer token, cursor pagination
+- ✅ **Exercise 2: Zendesk** - Basic auth, cursor pagination
+- ✅ **Exercise 3: HubSpot** - Bearer token, cursor pagination
+- ✅ **Exercise 4: Cursor** - Basic auth, POST requests
+- ✅ **Exercise 5: Claude AI** - Bearer token, custom headers
+- 🚧 **Exercise 6: Incident.io** - Coming soon
+- 🚧 **Exercise 7: Notion** - Coming soon
+- 🚧 **Exercise 8: Rootly** - Coming soon
 
 ## 🚀 Getting Started
 

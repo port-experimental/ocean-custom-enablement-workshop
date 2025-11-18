@@ -1,0 +1,87 @@
+[
+  {
+    "identifier": "claude_usage_record",
+    "description": "A daily summary record of Claude AI API usage for an organization",
+    "title": "Claude AI Usage Record",
+    "icon": "Anthropic",
+    "schema": {
+      "properties": {
+        "record_date": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Record Date (UTC)"
+        },
+        "organization_id": {
+          "type": "string",
+          "title": "Organization ID"
+        },
+        "organization_name": {
+          "type": "string",
+          "title": "Organization Name"
+        },
+        "total_requests": {
+          "type": "number",
+          "title": "Total Requests"
+        },
+        "successful_requests": {
+          "type": "number",
+          "title": "Successful Requests"
+        },
+        "failed_requests": {
+          "type": "number",
+          "title": "Failed Requests"
+        },
+        "total_input_tokens": {
+          "type": "number",
+          "title": "Total Input Tokens"
+        },
+        "total_output_tokens": {
+          "type": "number",
+          "title": "Total Output Tokens"
+        },
+        "total_cache_read_tokens": {
+          "type": "number",
+          "title": "Total Cache Read Tokens"
+        },
+        "total_cache_write_tokens": {
+          "type": "number",
+          "title": "Total Cache Write Tokens"
+        },
+        "total_cost_usd": {
+          "type": "number",
+          "title": "Total Cost (USD)"
+        },
+        "most_used_model": {
+          "type": "string",
+          "title": "Most Used Model"
+        }
+      },
+      "required": ["record_date", "organization_id"]
+    },
+    "mirrorProperties": {},
+    "calculationProperties": {
+      "success_rate": {
+        "title": "Success Rate",
+        "description": "Percentage of successful API requests",
+        "calculation": "if .properties.total_requests > 0 then (.properties.successful_requests / .properties.total_requests) * 100 else 0 end",
+        "type": "number",
+        "colorized": true,
+        "colors": {
+          "80": "red",
+          "90": "orange",
+          "95": "yellow",
+          "98": "green"
+        }
+      },
+      "total_tokens": {
+        "title": "Total Tokens",
+        "description": "Sum of input and output tokens",
+        "calculation": ".properties.total_input_tokens + .properties.total_output_tokens",
+        "type": "number"
+      }
+    },
+    "aggregationProperties": {},
+    "relations": {}
+  }
+]
+

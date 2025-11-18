@@ -1,0 +1,113 @@
+[
+  {
+    "identifier": "cursor_usage_record",
+    "description": "A daily summary record of Cursor usage for an organization (UTC)",
+    "title": "Cursor Usage Record",
+    "icon": "Cursor",
+    "schema": {
+      "properties": {
+        "record_date": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Record Date (UTC)"
+        },
+        "org": {
+          "type": "string",
+          "title": "Organization"
+        },
+        "total_accepts": {
+          "type": "number",
+          "title": "Total Accepts"
+        },
+        "total_rejects": {
+          "type": "number",
+          "title": "Total Rejects"
+        },
+        "total_tabs_shown": {
+          "type": "number",
+          "title": "Total Tabs Shown"
+        },
+        "total_tabs_accepted": {
+          "type": "number",
+          "title": "Total Tabs Accepted"
+        },
+        "total_lines_added": {
+          "type": "number",
+          "title": "Total Lines Added"
+        },
+        "total_lines_deleted": {
+          "type": "number",
+          "title": "Total Lines Deleted"
+        },
+        "accepted_lines_added": {
+          "type": "number",
+          "title": "Accepted Lines Added"
+        },
+        "accepted_lines_deleted": {
+          "type": "number",
+          "title": "Accepted Lines Deleted"
+        },
+        "composer_requests": {
+          "type": "number",
+          "title": "Composer Requests"
+        },
+        "chat_requests": {
+          "type": "number",
+          "title": "Chat Requests"
+        },
+        "agent_requests": {
+          "type": "number",
+          "title": "Agent Requests"
+        },
+        "total_input_tokens": {
+          "type": "number",
+          "title": "Total Input Tokens"
+        },
+        "total_output_tokens": {
+          "type": "number",
+          "title": "Total Output Tokens"
+        },
+        "total_cache_write_tokens": {
+          "type": "number",
+          "title": "Total Cache Write Tokens"
+        },
+        "total_cache_read_tokens": {
+          "type": "number",
+          "title": "Total Cache Read Tokens"
+        },
+        "total_cents": {
+          "type": "number",
+          "title": "Total Cost (cents)"
+        },
+        "most_used_model": {
+          "type": "string",
+          "title": "Most Used Model"
+        },
+        "total_active_users": {
+          "type": "number",
+          "title": "Total Active Users"
+        }
+      },
+      "required": ["record_date", "org"]
+    },
+    "mirrorProperties": {},
+    "calculationProperties": {
+      "acceptance_rate": {
+        "title": "Acceptance Rate",
+        "description": "Percentage of AI suggestions that were accepted",
+        "calculation": "if (.properties.total_accepts + .properties.total_rejects) > 0 then (.properties.total_accepts / (.properties.total_accepts + .properties.total_rejects)) * 100 else 0 end",
+        "type": "number",
+        "colorized": true,
+        "colors": {
+          "25": "red",
+          "50": "orange",
+          "75": "yellow",
+          "90": "green"
+        }
+      }
+    },
+    "aggregationProperties": {},
+    "relations": {}
+  }
+]
+
