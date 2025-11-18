@@ -38,9 +38,10 @@ Integrating Slack with Port allows you to visualize your team's communication st
 
 ### 3.1 Port Environment Access
 
-**Port Instance**: [Workshop Port URL]  
-**Username**: `y9em2haVu0WMdSQZKrU01u6nLpg4PXTu`  
-**Password**: `4vcZ3lacigc7krmuSRA4IWPifMHWxYa1gRoQ2h4Ed0YsuWYwjHc6rUY9SoA8uUEZ`
+**Request the Port credentials from Matar** - you'll need:
+- Port Client ID
+- Port Client Secret
+- Port Instance URL
 
 > 💡 **Tip**: Log in to Port and verify you can access the workspace.
 
@@ -87,15 +88,15 @@ kubectl get nodes
 
 ### 4.1 Install the Integration
 
-**Copy and paste this command** (replace `[YOUR_SLACK_BOT_TOKEN]` with your Slack bot token):
+**Copy and paste this command** (replace the placeholders with your credentials):
 
 ```bash
 helm repo add port-labs https://port-labs.github.io/helm-charts && \
 helm repo update && \
 helm install slack-integration port-labs/port-ocean \
   --namespace workshop-test \
-  --set port.clientId=y9em2haVu0WMdSQZKrU01u6nLpg4PXTu \
-  --set port.clientSecret=4vcZ3lacigc7krmuSRA4IWPifMHWxYa1gRoQ2h4Ed0YsuWYwjHc6rUY9SoA8uUEZ \
+  --set port.clientId=[YOUR_PORT_CLIENT_ID] \
+  --set port.clientSecret=[YOUR_PORT_CLIENT_SECRET] \
   --set port.baseUrl=https://api.getport.io \
   --set integration.identifier=slack-integration \
   --set integration.type=custom \
@@ -114,24 +115,24 @@ helm install slack-integration port-labs/port-ocean \
   --set scheduledResyncInterval=1440
 ```
 
-**Replace this value:**
-- `[YOUR_SLACK_BOT_TOKEN]` - Your Slack bot token from step 3.3 (starts with `xoxb-`)
+**Replace these values:**
+- `[YOUR_PORT_CLIENT_ID]` - Port Client ID from step 3.1
+- `[YOUR_PORT_CLIENT_SECRET]` - Port Client Secret from step 3.1
+- `[YOUR_SLACK_BOT_TOKEN]` - Slack bot token from step 3.3 (starts with `xoxb-`)
 
 **Understanding Ocean Custom-specific configurations:**
 
-These flags configure how Ocean Custom connects to the Slack API:
-
-- `integration.type=custom` - Specifies this is an Ocean Custom integration (connects to any HTTP REST API)
-- `integration.config.baseUrl=https://slack.com/api` - The base URL of the Slack API
-- `integration.config.authType=bearer_token` - Authentication method (Slack uses Bearer token auth)
-- `integration.config.apiToken=[YOUR_SLACK_BOT_TOKEN]` - Your Slack bot token (sent as `Authorization: Bearer <token>` header)
-- `integration.config.paginationType=cursor` - Slack uses cursor-based pagination (not offset/page number)
-- `integration.config.pageSize=200` - Fetch 200 items per API call
-- `integration.config.paginationParam=cursor` - The query parameter name Slack expects (`?cursor=...`)
-- `integration.config.sizeParam=limit` - The query parameter name for page size (`?limit=200`)
-- `integration.config.cursorPath=response_metadata.next_cursor` - JQ path to extract the next cursor from Slack's response
-- `integration.config.hasMorePath=response_metadata.next_cursor` - JQ path to check if more pages exist (if cursor exists, there are more pages)
-- `integration.eventListener.type=POLLING` - Uses polling mode (required for Ocean Custom, instead of Kafka)
+- `integration.type=custom` - Ocean Custom integration type
+- `integration.config.baseUrl` - Slack API base URL
+- `integration.config.authType` - Authentication method (bearer_token)
+- `integration.config.apiToken` - Slack bot token (sent as Authorization header)
+- `integration.config.paginationType` - Pagination method (cursor-based)
+- `integration.config.pageSize` - Items per API call (200)
+- `integration.config.paginationParam` - Query param name for cursor (`cursor`)
+- `integration.config.sizeParam` - Query param name for page size (`limit`)
+- `integration.config.cursorPath` - JQ path to extract next cursor from response
+- `integration.config.hasMorePath` - JQ path to check if more pages exist
+- `integration.eventListener.type=POLLING` - Polling mode (required for Ocean Custom)
 
 ✅ **Checkpoint**: Verify the installation by going to **Port UI → Data Sources → slack-integration**
 
