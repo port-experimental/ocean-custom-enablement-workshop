@@ -117,31 +117,29 @@ helm install slack-integration port-labs/port-ocean \
 **Replace this value:**
 - `[YOUR_SLACK_BOT_TOKEN]` - Your Slack bot token from step 3.3 (starts with `xoxb-`)
 
-**What do these Helm flags do?**
-- `integration.eventListener.type=POLLING` - Uses polling instead of Kafka (required for custom integrations)
-- `initializePortResources=true` - Automatically creates default blueprints and mappings (we'll override with our own)
-- `sendRawDataExamples=true` - Sends sample API responses to Port for testing
-- `scheduledResyncInterval=1440` - Resyncs every 1440 minutes (24 hours)
+**Understanding Ocean Custom-specific configurations:**
+
+These flags configure how Ocean Custom connects to the Slack API:
+
+- `integration.type=custom` - Specifies this is an Ocean Custom integration (connects to any HTTP REST API)
+- `integration.config.baseUrl=https://slack.com/api` - The base URL of the Slack API
+- `integration.config.authType=bearer_token` - Authentication method (Slack uses Bearer token auth)
+- `integration.config.apiToken=[YOUR_SLACK_BOT_TOKEN]` - Your Slack bot token (sent as `Authorization: Bearer <token>` header)
+- `integration.config.paginationType=cursor` - Slack uses cursor-based pagination (not offset/page number)
+- `integration.config.pageSize=200` - Fetch 200 items per API call
+- `integration.config.paginationParam=cursor` - The query parameter name Slack expects (`?cursor=...`)
+- `integration.config.sizeParam=limit` - The query parameter name for page size (`?limit=200`)
+- `integration.config.cursorPath=response_metadata.next_cursor` - JQ path to extract the next cursor from Slack's response
+- `integration.config.hasMorePath=response_metadata.next_cursor` - JQ path to check if more pages exist (if cursor exists, there are more pages)
+- `integration.eventListener.type=POLLING` - Uses polling mode (required for Ocean Custom, instead of Kafka)
 
 ✅ **Checkpoint**: Verify the installation by going to **Port UI → Data Sources → slack-integration**
 
 ### 4.2 Create Blueprints in Port
 
-**What are blueprints?** Blueprints are the data models in Port - they define what properties and relationships your entities will have. Think of them like database schemas.
+Go to Port → **Software Catalog** → **Blueprints** → **Create Blueprint** (JSON tab) and create the following blueprints:
 
-We need to create blueprints before the integration can sync data. Each blueprint defines the structure of entities that will be created.
-
-**Navigate to Blueprints:**
-
-1. Go to your Port workspace
-2. Click **"Software Catalog"** → **"Blueprints"**
-3. Click **"Create Blueprint"**
-
-**Create Blueprint 1: Ocean Slack User**
-
-1. Click **"Create Blueprint"**
-2. Select **"JSON"** tab
-3. Copy and paste the following JSON:
+**Blueprint 1: Ocean Slack User**
 
 ```json
 {
@@ -197,15 +195,7 @@ We need to create blueprints before the integration can sync data. Each blueprin
 }
 ```
 
-4. Click **"Create"**
-
-✅ **Checkpoint**: You should see the blueprint created in your catalog.
-
-**Create Blueprint 2: Ocean Slack Channel**
-
-1. Click **"Create Blueprint"**
-2. Select **"JSON"** tab
-3. Copy and paste the following JSON:
+**Blueprint 2: Ocean Slack Channel**
 
 ```json
 {
@@ -262,8 +252,6 @@ We need to create blueprints before the integration can sync data. Each blueprin
   }
 }
 ```
-
-4. Click **"Create"**
 
 ✅ **Checkpoint**: You should now have 2 blueprints created: "Ocean Slack User" and "Ocean Slack Channel"
 
