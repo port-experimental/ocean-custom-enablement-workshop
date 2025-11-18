@@ -601,15 +601,15 @@ Congratulations! 🎉 You've successfully integrated HubSpot with Port.
 
 **What you learned:**
 - ✅ How to configure cursor pagination with HubSpot's API
-- ✅ How to map HubSpot CRM data to Port entities
-- ✅ How to use JQ expressions for data transformation
+- ✅ How to map HubSpot CRM data using `data_path` and `query_params`
+- ✅ How to use JQ expressions for data transformation and relations
 - ✅ How to handle HubSpot's property-based query system
 
 **Try these next:**
-- Integrate another tool using the same process
-- Add more properties to your blueprints
-- Create relations between entities (e.g., deals → companies, deals → contacts)
-- Explore Port's query builder with your HubSpot data
+- Integrate another tool using Ocean Custom (try Slack or Zendesk exercises)
+- Experiment with different query parameters and property selection
+- Try mapping associations and relations between entities
+- Add more HubSpot endpoints (products, tickets, etc.)
 
 ---
 
@@ -619,8 +619,4 @@ Congratulations! 🎉 You've successfully integrated HubSpot with Port.
 - [HubSpot API Documentation](https://developers.hubspot.com/docs/api/overview)
 - [HubSpot CRM Objects API](https://developers.hubspot.com/docs/api/crm/understanding-the-crm)
 - [JQ Expression Guide](https://stedolan.github.io/jq/manual/)
-
----
-
-**Workshop Support**: Questions? Ask in the workshop Slack channel or reach out to facilitators.
 

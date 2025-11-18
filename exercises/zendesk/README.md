@@ -524,14 +524,14 @@ Congratulations! 🎉 You've successfully integrated Zendesk with Port.
 **What you learned:**
 - ✅ How to use Basic Authentication with Ocean Custom
 - ✅ How to configure cursor pagination with custom parameter names (`page[after]`, `page[size]`)
-- ✅ How to map Zendesk API data to Port entities
+- ✅ How to map Zendesk API data using `data_path` to extract arrays
 - ✅ How to use JQ expressions for data transformation
 
 **Try these next:**
-- Integrate another tool using the same process
-- Add more properties to your blueprints
-- Create relations between entities (e.g., tickets → users, tickets → organizations)
-- Explore Port's query builder with your Zendesk data
+- Integrate another tool using Ocean Custom (try Slack or HubSpot exercises)
+- Experiment with dynamic path parameters for nested endpoints
+- Try different authentication methods (Bearer token, API Key)
+- Add more Zendesk endpoints to your mapping
 
 ---
 
@@ -541,8 +541,4 @@ Congratulations! 🎉 You've successfully integrated Zendesk with Port.
 - [Zendesk API Documentation](https://developer.zendesk.com/api-reference)
 - [Zendesk API Reference](https://developer.zendesk.com/api-reference/introduction/)
 - [JQ Expression Guide](https://stedolan.github.io/jq/manual/)
-
----
-
-**Workshop Support**: Questions? Ask in the workshop Slack channel or reach out to facilitators.
 

@@ -498,19 +498,20 @@ kubectl describe pod -l app.kubernetes.io/instance=slack-integration
 
 ## Next Steps
 
-Congratulations! 🎉 You've successfully integrated Slack with Port.
+Congratulations! 🎉 You've successfully integrated Slack with Ocean Custom.
 
 **What you learned:**
-- ✅ How to create blueprints in Port
-- ✅ How to install Ocean Custom integration via Helm on EKS
-- ✅ How to configure resource mappings with Slack API
+- ✅ How to install Ocean Custom integration via Helm
+- ✅ How to configure Bearer token authentication
+- ✅ How to set up cursor-based pagination
+- ✅ How to map API endpoints using `kind` and `data_path`
 - ✅ How to use JQ expressions for data transformation
 
 **Try these next:**
-- Integrate another tool using the same process
-- Add more properties to your blueprints
-- Create relations between entities
-- Explore Port's query builder with your Slack data
+- Integrate another tool using Ocean Custom (try Zendesk or HubSpot exercises)
+- Experiment with different pagination types (offset, page)
+- Add more API endpoints to your mapping
+- Try Basic Auth or API Key Auth with other tools
 
 ---
 
@@ -520,8 +521,4 @@ Congratulations! 🎉 You've successfully integrated Slack with Port.
 - [Slack Web API Documentation](https://api.slack.com/web)
 - [Slack API Methods](https://api.slack.com/methods)
 - [JQ Expression Guide](https://stedolan.github.io/jq/manual/)
-
----
-
-**Workshop Support**: Questions? Ask in the workshop Slack channel or reach out to facilitators.
 
