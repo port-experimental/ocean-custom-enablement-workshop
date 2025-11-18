@@ -38,12 +38,16 @@ Integrating Slack with Port allows you to visualize your team's communication st
 
 ### 3.1 Port Environment Access
 
-**Request the Port credentials from Matar** - you'll need:
-- Port Client ID
-- Port Client Secret
-- Port Instance URL
+**Sign up / Log in to Port** using your email with the workshop suffix:
+- Email: `<your-port-email>+ocean-custom-workshop@getport.io`
+- Example: If your email is `john@getport.io`, use `john+ocean-custom-workshop@getport.io`
 
-> 💡 **Tip**: Log in to Port and verify you can access the workspace.
+After signing up/logging in, get your Port credentials:
+1. Go to **Port Settings** → **Credentials**
+2. Copy your **Client ID** and **Client Secret**
+3. You'll need these for the Helm installation in step 4.1
+
+> 💡 **Tip**: Verify you can access the workspace after signing up/logging in.
 
 ### 3.2 Kubernetes Cluster Access
 
