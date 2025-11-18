@@ -87,12 +87,6 @@ kubectl get nodes
 
 ### 4.1 Install the Integration
 
-**First, create the namespace (if it doesn't exist):**
-
-```bash
-kubectl create namespace workshop-test
-```
-
 **Copy and paste this command** (replace `[YOUR_SLACK_BOT_TOKEN]` with your Slack bot token):
 
 ```bash
