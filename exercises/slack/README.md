@@ -142,8 +142,6 @@ helm install slack-integration port-labs/port-ocean \
 
 ### 4.2 Create Blueprints in Port
 
-Go to Port → **Software Catalog** → **Blueprints** → **Create Blueprint** (JSON tab) and create the following blueprints:
-
 **Blueprint 1: Ocean Slack User**
 
 ```json
@@ -328,6 +326,47 @@ resources:
             creator: .creator
 ```
 
+**How the mapping translates to HTTP requests:**
+
+Based on the first resource mapping (`/api/users.list`), Port will make this HTTP request:
+
+```http
+GET https://slack.com/api/users.list?limit=100
+Authorization: Bearer xoxb-your-token-here
+```
+
+The Slack API will respond with:
+```json
+{
+  "ok": true,
+  "members": [
+    {
+      "id": "U123456",
+      "name": "john.doe",
+      "real_name": "John Doe",
+      "profile": {
+        "display_name": "John",
+        "email": "john@example.com",
+        "status_text": "Working on Ocean",
+        "status_emoji": ":rocket:",
+        "image_512": "https://..."
+      },
+      "is_admin": true,
+      "is_bot": false,
+      "tz": "America/New_York"
+    }
+  ],
+  "response_metadata": {
+    "next_cursor": "dXNlcjpVMTIzNDU2"
+  }
+}
+```
+
+Port then:
+1. Uses `data_path: .members` to extract the array of members
+2. Applies the JQ mappings to create Port entities (e.g., `identifier: .id`, `title: .real_name // .name`)
+3. Uses pagination config to fetch more pages if `response_metadata.next_cursor` exists
+
 **Understanding Ocean Custom-specific fields:**
 - `kind`: **This is the API endpoint path itself** (e.g., `/api/users.list`). Each endpoint is tracked separately in Port's UI.
 - `data_path`: **JQ expression to extract the data array** from the API response. 
@@ -345,12 +384,15 @@ resources:
   We use `data_path: .members` to extract just the array of members.
   
 - `query_params`: Query parameters to send with the request (e.g., `limit: "100"`).
-- `blueprint`: The blueprint identifier (must match what you created in step 4.1).
 
-**Understanding JQ expressions:**
-- `.real_name // .name` - Uses `real_name` if it exists, otherwise falls back to `name` (the `//` operator means "or")
-- `.purpose.value // ""` - Extracts `purpose.value`, or uses empty string if it doesn't exist
-- `.profile.display_name` - Accesses nested properties using dot notation
+**Additional Ocean Custom configurations** (not used in this example):
+
+- **Basic Authentication**: Use `authType=basic` with `username` and `password` instead of bearer token
+- **API Key Authentication**: Use `authType=api_key` with `apiKey` and optional `apiKeyHeader` (defaults to `X-API-Key`)
+- **Offset Pagination**: Use `paginationType=offset` with `offsetParam` and `limitParam` for APIs that use offset/limit
+- **Page Pagination**: Use `paginationType=page` with `pageParam` and `sizeParam` for APIs that use page numbers
+- **Dynamic Path Parameters**: Use dynamic endpoints to query APIs and discover parameter values for nested endpoints
+- **Custom Headers**: Add custom headers via `headers` in the resource mapping selector
 
 **Save and Sync:**
 
@@ -428,7 +470,7 @@ kubectl describe pod -l app.kubernetes.io/instance=slack-integration
 
 1. Check integration status in Port UI → Data Sources → slack-integration
 2. Verify blueprints are created correctly
-3. Verify `blueprint` identifier in mapping matches blueprint identifier
+3. Verify the `blueprint` field in your mapping
 4. Check `data_path` - Slack API wraps responses, so you need `data_path: .members` for users, `.channels` for channels, etc.
 
 ### Issue: Authentication errors
