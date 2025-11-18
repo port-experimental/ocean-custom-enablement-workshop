@@ -25,11 +25,11 @@ Integrating Cursor with Port allows you to track AI coding assistant usage metri
 
 - **Tool Name**: Cursor
 - **API Documentation**: [Cursor API](https://cursor.com/docs/api)
-- **Authentication Method**: Basic Auth (API Key as username, empty password)
+- **Authentication Method**: Basic Auth (API Key as username, colon ":" as password)
 - **Base URL**: `https://api.cursor.com`
 
 **What data will we sync?**
-- **Cursor Usage Records** - Daily organization-level usage metrics including accepts, rejects, tokens, and costs
+- **Cursor Usage Records** - Daily user-level usage metrics including accepts, rejects, lines added/deleted, and AI model usage (organization extracted from email domain)
 
 ---
 
@@ -129,7 +129,7 @@ helm install cursor-integration port-labs/port-ocean \
   --set integration.config.baseUrl=https://api.cursor.com \
   --set integration.config.authType=basic \
   --set integration.config.username=[YOUR_CURSOR_API_KEY] \
-  --set integration.config.password="" \
+  --set integration.config.password=":" \
   --set integration.config.paginationType=none \
   --set initializePortResources=true \
   --set sendRawDataExamples=true \
@@ -147,7 +147,7 @@ helm install cursor-integration port-labs/port-ocean \
 - `integration.config.baseUrl` - Cursor API base URL
 - `integration.config.authType` - Authentication method (basic)
 - `integration.config.username` - Cursor API key (used as Basic Auth username)
-- `integration.config.password` - Empty string (Cursor API doesn't use password)
+- `integration.config.password` - Colon ":" (Cursor API uses Basic Auth with empty password, but Ocean Custom requires a non-empty value)
 - `integration.config.paginationType` - No pagination (none)
 - `integration.eventListener.type=POLLING` - Polling mode (required for Ocean Custom)
 - `scheduledResyncInterval=120` - Resync every 120 minutes (2 hours)
@@ -300,30 +300,30 @@ resources:
     port:
       entity:
         mappings:
-          identifier: .org + "@" + .date
-          title: .org + " usage " + .date
+          identifier: .userId + "@" + .day
+          title: .email + " usage " + .day
           blueprint: '"cursor_usage_record"'
           properties:
-            record_date: .date + "T00:00:00Z"
-            org: .org
-            total_accepts: .totals.total_accepts
-            total_rejects: .totals.total_rejects
-            total_tabs_shown: .totals.total_tabs_shown
-            total_tabs_accepted: .totals.total_tabs_accepted
-            total_lines_added: .totals.total_lines_added
-            total_lines_deleted: .totals.total_lines_deleted
-            accepted_lines_added: .totals.accepted_lines_added
-            accepted_lines_deleted: .totals.accepted_lines_deleted
-            composer_requests: .totals.composer_requests
-            chat_requests: .totals.chat_requests
-            agent_requests: .totals.agent_requests
-            total_input_tokens: .totals.total_input_tokens
-            total_output_tokens: .totals.total_output_tokens
-            total_cache_write_tokens: .totals.total_cache_write_tokens
-            total_cache_read_tokens: .totals.total_cache_read_tokens
-            total_cents: .totals.total_cents
-            most_used_model: .totals.most_used_model
-            total_active_users: .totals.total_active_users
+            record_date: .day + "T00:00:00Z"
+            org: (.email | split("@")[1]) // "unknown"
+            total_accepts: .totalAccepts // 0
+            total_rejects: .totalRejects // 0
+            total_tabs_shown: .totalTabsShown // 0
+            total_tabs_accepted: .totalTabsAccepted // 0
+            total_lines_added: .totalLinesAdded // 0
+            total_lines_deleted: .totalLinesDeleted // 0
+            accepted_lines_added: .acceptedLinesAdded // 0
+            accepted_lines_deleted: .acceptedLinesDeleted // 0
+            composer_requests: .composerRequests // 0
+            chat_requests: .chatRequests // 0
+            agent_requests: .agentRequests // 0
+            total_input_tokens: 0
+            total_output_tokens: 0
+            total_cache_write_tokens: 0
+            total_cache_read_tokens: 0
+            total_cents: 0
+            most_used_model: .mostUsedModel // ""
+            total_active_users: 0
 ```
 
 **How the mapping translates to HTTP requests:**
@@ -346,17 +346,24 @@ The Cursor API will respond with:
 {
   "data": [
     {
-      "date": "2024-01-15",
-      "org": "my-org",
-      "totals": {
-        "total_accepts": 150,
-        "total_rejects": 50,
-        "total_tabs_shown": 200,
-        "total_input_tokens": 50000,
-        "total_output_tokens": 30000,
-        "total_cents": 500,
-        "most_used_model": "claude-3-opus"
-      }
+      "date": 1763424000000,
+      "day": "2025-11-18",
+      "userId": "user_Cs774Te78D01KmETGkgN4rdwpn",
+      "email": "aaront@getport.io",
+      "isActive": true,
+      "totalLinesAdded": 150,
+      "totalLinesDeleted": 50,
+      "acceptedLinesAdded": 120,
+      "acceptedLinesDeleted": 45,
+      "totalApplies": 10,
+      "totalAccepts": 8,
+      "totalRejects": 2,
+      "totalTabsShown": 200,
+      "totalTabsAccepted": 50,
+      "composerRequests": 5,
+      "chatRequests": 3,
+      "agentRequests": 15,
+      "mostUsedModel": "claude-4.5-sonnet"
     }
   ]
 }
@@ -364,14 +371,17 @@ The Cursor API will respond with:
 
 Port then:
 1. Uses `data_path: .data` to extract the array of usage records
-2. Applies the JQ mappings to create Port entities (e.g., `identifier: .org + "@" + .date`)
-3. Extracts nested properties from `.totals` object
+2. Applies the JQ mappings to create Port entities (e.g., `identifier: .userId + "@" + .day`)
+3. Maps camelCase API fields to snake_case blueprint properties (e.g., `.totalAccepts` → `total_accepts`)
+4. Extracts organization domain from email using `.email | split("@")[1]`
 
 **Understanding Ocean Custom-specific fields:**
 - `kind`: **This is the API endpoint path itself** (e.g., `/teams/daily-usage-data`). Each endpoint is tracked separately in Port's UI.
 - `method: POST` - **Cursor uses POST requests** with a JSON body (unlike GET requests in other examples)
 - `body`: **JQ expression to generate the request body** - calculates date range dynamically
 - `data_path`: **JQ expression to extract the data array** from the API response
+- **Field mapping**: The API returns camelCase fields (e.g., `totalAccepts`), which are mapped to snake_case blueprint properties (e.g., `total_accepts`)
+- **Default values**: Uses `//` operator to provide defaults for missing/null values (e.g., `.totalAccepts // 0`)
 
 **Additional Ocean Custom configurations:**
 
@@ -452,7 +462,7 @@ kubectl describe pod -l app.kubernetes.io/instance=cursor-integration -n worksho
 
 - Verify Cursor API key is correct
 - Check that your API key has access to the organization data you're trying to sync
-- Ensure Basic Auth is configured correctly (API key as username, empty password)
+- Ensure Basic Auth is configured correctly (`authType=basic`, `username` set to API key, `password` set to `":"`)
 
 ### Issue: POST request errors
 
@@ -467,10 +477,11 @@ kubectl describe pod -l app.kubernetes.io/instance=cursor-integration -n worksho
 Congratulations! 🎉 You've successfully integrated Cursor with Ocean Custom.
 
 **What you learned:**
-- ✅ How to use Basic Authentication with API key as username
+- ✅ How to use Basic Authentication with API key as username and colon ":" as password
 - ✅ How to configure POST requests with dynamic JSON bodies
-- ✅ How to use JQ expressions to generate request bodies
-- ✅ How to map nested API responses using `data_path`
+- ✅ How to use JQ expressions to generate request bodies and map camelCase to snake_case
+- ✅ How to extract organization information from email addresses using JQ
+- ✅ How to handle default values in JQ expressions using the `//` operator
 
 **Try these next:**
 - Integrate another tool using Ocean Custom (try Claude AI or other exercises)
