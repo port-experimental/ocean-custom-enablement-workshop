@@ -51,6 +51,8 @@ After signing up/logging in, get your Port credentials:
 
 ### 3.2 Kubernetes Cluster Access
 
+**Option A: Use Port's EKS Cluster** (Recommended for workshop)
+
 **Cluster Name**: `matar-porternal-ocean-dev`  
 **Region**: `us-east-1`  
 **AWS Profile**: `se-sandbox`
@@ -81,6 +83,26 @@ kubectl get nodes
 ```
 
 ✅ **Checkpoint**: You should see nodes listed. If not, ask for help!
+
+**Option B: Use Local Minikube** (Alternative for local testing)
+
+**Set up Minikube:**
+
+```bash
+# Install minikube (if not already installed)
+brew install minikube
+
+# Start minikube
+minikube start
+
+# Verify minikube is running
+kubectl get nodes
+
+# Create the namespace
+kubectl create namespace workshop-test
+```
+
+✅ **Checkpoint**: You should see a minikube node listed. If not, check minikube status with `minikube status`.
 
 ### 3.3 Tool API Credentials
 
