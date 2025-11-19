@@ -127,8 +127,9 @@ helm install claude-integration port-labs/port-ocean \
   --set integration.type=custom \
   --set integration.eventListener.type=POLLING \
   --set integration.config.baseUrl=https://api.anthropic.com \
-  --set integration.config.authType=bearer_token \
-  --set integration.config.apiToken=[YOUR_ANTHROPIC_API_KEY] \
+  --set integration.config.authType=api_key \
+  --set integration.config.apiKey=[YOUR_ANTHROPIC_API_KEY] \
+  --set integration.config.apiKeyHeader=x-api-key \
   --set integration.config.paginationType=none \
   --set initializePortResources=true \
   --set sendRawDataExamples=true \
@@ -144,8 +145,9 @@ helm install claude-integration port-labs/port-ocean \
 
 - `integration.type=custom` - Ocean Custom integration type
 - `integration.config.baseUrl` - Anthropic API base URL
-- `integration.config.authType` - Authentication method (bearer_token)
-- `integration.config.apiToken` - Anthropic Admin API key (sent as Authorization header)
+- `integration.config.authType` - Authentication method (api_key)
+- `integration.config.apiKey` - Anthropic Admin API key
+- `integration.config.apiKeyHeader` - Header name for API key (x-api-key)
 - `integration.config.paginationType` - No pagination (none)
 - `integration.eventListener.type=POLLING` - Polling mode (required for Ocean Custom)
 - `scheduledResyncInterval=120` - Resync every 120 minutes (2 hours)
@@ -251,14 +253,6 @@ Now we need to tell the integration which API endpoints to call and how to map t
 2. Find your integration: `claude-integration`
 3. Click **"Configure"** or **"Edit Configuration"**
 
-**Important: Add Custom Headers First**
-
-Before adding the resource mapping, you need to configure custom HTTP headers. Go to **Advanced Settings → Headers** and add:
-- `anthropic-version: 2023-06-01`
-- `anthropic-beta: admin-1`
-
-These headers are required for Anthropic Admin API endpoints.
-
 **Add Resource Mapping:**
 
 Click **"Add Resource"** or **"Edit Configuration"** and copy-paste this complete YAML block:
@@ -269,9 +263,12 @@ resources:
     selector:
       query: 'true'
       method: GET
+      headers:
+        anthropic-version: "2023-06-01"
+        anthropic-beta: "admin-1"
       query_params:
-        starting_at: '((now | floor) - (86400 * 30)) | strftime("%Y-%m-%dT00:00:00Z")'
-        ending_at: '(now | floor) | strftime("%Y-%m-%dT00:00:00Z")'
+        starting_at: "2024-10-19T00:00:00Z"
+        ending_at: "2024-11-18T00:00:00Z"
         bucket_width: "1d"
       data_path: '.data[].results[]'
     port:
@@ -292,6 +289,7 @@ resources:
             total_cache_read_tokens: .cache_read_input_tokens // 0
             total_cache_write_tokens: .cache_write_input_tokens // 0
             total_cost_usd: .cost_usd // 0
+            most_used_model: .most_used_model // ""
 ```
 
 **How the mapping translates to HTTP requests:**
@@ -299,8 +297,8 @@ resources:
 Based on the resource mapping, Port will make this HTTP request:
 
 ```http
-GET https://api.anthropic.com/v1/organizations/usage_report/messages?starting_at=2024-01-01T00:00:00Z&ending_at=2024-01-31T00:00:00Z&bucket_width=1d
-Authorization: Bearer sk-ant-api03-...
+GET https://api.anthropic.com/v1/organizations/usage_report/messages?starting_at=2024-10-19T00:00:00Z&ending_at=2024-11-18T00:00:00Z&bucket_width=1d
+x-api-key: sk-ant-admin01-...
 anthropic-version: 2023-06-01
 anthropic-beta: admin-1
 ```
@@ -310,36 +308,62 @@ The Anthropic API will respond with:
 {
   "data": [
     {
-      "starting_at": "2024-01-15T00:00:00Z",
-      "ending_at": "2024-01-16T00:00:00Z",
+      "starting_at": "2024-10-19T00:00:00Z",
+      "ending_at": "2024-10-20T00:00:00Z",
       "results": [
         {
-          "date": "2024-01-15",
+          "date": "2024-10-19",
           "organization_id": "org-123",
-          "organization_name": "My Org",
-          "requests": 1000,
-          "successful_requests": 980,
-          "failed_requests": 20,
-          "input_tokens": 500000,
-          "output_tokens": 300000,
-          "cost_usd": 15.50
+          "organization_name": "My Organization",
+          "requests": 1250,
+          "successful_requests": 1220,
+          "failed_requests": 30,
+          "input_tokens": 650000,
+          "output_tokens": 420000,
+          "cache_read_input_tokens": 50000,
+          "cache_write_input_tokens": 30000,
+          "cost_usd": 18.75,
+          "most_used_model": "claude-3-opus-20240229"
+        }
+      ]
+    },
+    {
+      "starting_at": "2024-10-20T00:00:00Z",
+      "ending_at": "2024-10-21T00:00:00Z",
+      "results": [
+        {
+          "date": "2024-10-20",
+          "organization_id": "org-123",
+          "organization_name": "My Organization",
+          "requests": 980,
+          "successful_requests": 965,
+          "failed_requests": 15,
+          "input_tokens": 520000,
+          "output_tokens": 380000,
+          "cache_read_input_tokens": 45000,
+          "cache_write_input_tokens": 28000,
+          "cost_usd": 15.20,
+          "most_used_model": "claude-3-sonnet-20240229"
         }
       ]
     }
-  ]
+  ],
+  "has_more": false
 }
 ```
+
+**Note**: The API returns data in buckets (date ranges). Each bucket contains a `results` array with usage metrics. Empty `results` arrays are normal when there's no usage data for that date range. The `data_path: '.data[].results[]'` will extract all items from all non-empty results arrays.
 
 Port then:
 1. Uses `data_path: '.data[].results[]'` to extract the array from nested buckets
 2. Applies the JQ mappings to create Port entities
-3. Uses JQ expressions in `query_params` to generate dynamic date ranges
+3. Only creates entities for non-empty results arrays
 
 **Understanding Ocean Custom-specific fields:**
 - `kind`: **This is the API endpoint path itself** (e.g., `/v1/organizations/usage_report/messages`). Each endpoint is tracked separately in Port's UI.
-- `query_params`: **JQ expressions to generate query parameters** - dynamically calculates date ranges
+- `headers`: **Custom HTTP headers** - Required for Anthropic Admin API (`anthropic-version` and `anthropic-beta`)
+- `query_params`: **Static query parameters** - Date ranges and other API parameters (note: Ocean Custom doesn't evaluate JQ expressions in query_params, so use static values)
 - `data_path`: **JQ expression to extract nested arrays** - Anthropic returns data in buckets with nested results arrays
-- **Custom Headers**: Required for Anthropic Admin API - must be configured in Advanced Settings
 
 **Additional Ocean Custom configurations:**
 
@@ -351,13 +375,15 @@ For advanced configurations like Basic Auth, API Key Auth, Offset/Page Paginatio
 2. The integration will automatically start syncing
 3. Go to **"Software Catalog"** → **"Entities"** to see your data
 
-✅ **Checkpoint**: After 1-2 minutes, you should see entities appearing in Port!
+✅ **Checkpoint**: After 1-2 minutes, check Port's catalog. If there's usage data in the queried date range, you'll see entities. If not, the integration is still working correctly - it's just that there's no data to sync.
 
 ---
 
 ## 6. Verify the Integration
 
-Go to Port's catalog and check if data is synced in. You should see Claude AI usage records appearing as entities.
+Go to Port's catalog and check if data is synced in. 
+
+**Note**: If you see the integration running but no entities are created, this is normal! The Anthropic API returns empty `results` arrays when there's no usage data for the queried date range. The integration is working correctly - it's making successful API calls, but there's simply no usage data to sync. Once there's actual Claude API usage in your organization, entities will be created automatically.
 
 ---
 
@@ -411,11 +437,16 @@ kubectl describe pod -l app.kubernetes.io/instance=claude-integration -n worksho
 
 ### Issue: No entities syncing
 
+**First, check if this is expected**: The Anthropic API returns empty `results` arrays when there's no usage data. If the integration is making successful API calls (check logs), but no entities are created, this is normal - there's simply no data to sync.
+
+If you expect data but see none:
+
 1. Check integration status in Port UI → Data Sources → claude-integration
 2. Verify blueprints are created correctly
 3. Verify the `blueprint` field in your mapping
 4. Check `data_path` - Anthropic API uses nested structures, so you need `data_path: '.data[].results[]'`
-5. **Verify custom headers are configured** - Go to Advanced Settings → Headers and ensure `anthropic-version` and `anthropic-beta` are set
+5. **Verify custom headers are in the mapping** - Ensure `headers` section includes `anthropic-version: "2023-06-01"` and `anthropic-beta: "admin-1"`
+6. Check the API response - verify that `results` arrays contain data by testing the endpoint directly with curl
 
 ### Issue: Authentication errors
 
@@ -425,7 +456,7 @@ kubectl describe pod -l app.kubernetes.io/instance=claude-integration -n worksho
 
 ### Issue: API errors (400/401)
 
-- **Most common**: Missing custom headers - ensure `anthropic-version: 2023-06-01` and `anthropic-beta: admin-1` are configured
+- **Most common**: Missing custom headers - ensure `headers` section in your mapping includes `anthropic-version: "2023-06-01"` and `anthropic-beta: "admin-1"`
 - Verify date format in query parameters matches Anthropic's expected format
 - Check that your API key has access to the Admin API endpoints
 
@@ -436,10 +467,11 @@ kubectl describe pod -l app.kubernetes.io/instance=claude-integration -n worksho
 Congratulations! 🎉 You've successfully integrated Claude AI with Ocean Custom.
 
 **What you learned:**
-- ✅ How to configure custom HTTP headers for API requirements
-- ✅ How to use JQ expressions in query parameters for dynamic values
-- ✅ How to map nested API responses using complex `data_path` expressions
+- ✅ How to configure API key authentication with custom header name (`x-api-key`)
+- ✅ How to configure custom HTTP headers directly in resource mapping
+- ✅ How to map nested API responses using complex `data_path` expressions (`.data[].results[]`)
 - ✅ How to handle Anthropic Admin API's bucket-based response structure
+- ✅ How to work with APIs that return empty results when there's no data
 
 **Try these next:**
 - Integrate another tool using Ocean Custom (try Cursor or other exercises)
