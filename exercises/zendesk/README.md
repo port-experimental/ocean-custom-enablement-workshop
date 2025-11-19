@@ -30,8 +30,6 @@ Integrating Zendesk with Port allows you to visualize your customer support stru
 
 **What data will we sync?**
 - **Zendesk Users** - Support team members with roles and organization info
-- **Zendesk Tickets** - Customer support tickets with status and priority
-- **Zendesk Organizations** - Customer organizations
 
 ---
 
@@ -215,93 +213,7 @@ helm install zendesk-integration port-labs/port-ocean \
 }
 ```
 
-**Blueprint 2: Zendesk Ticket**
-
-```json
-{
-  "identifier": "zendesk_ticket",
-  "title": "Zendesk Ticket",
-  "icon": "Microservice",
-  "schema": {
-    "properties": {
-      "status": {
-        "type": "string",
-        "title": "Status",
-        "enum": ["new", "open", "pending", "hold", "solved", "closed"]
-      },
-      "priority": {
-        "type": "string",
-        "title": "Priority",
-        "enum": ["low", "normal", "high", "urgent"]
-      },
-      "requester_id": {
-        "type": "string",
-        "title": "Requester ID"
-      },
-      "url": {
-        "type": "string",
-        "title": "Ticket URL",
-        "format": "url"
-      },
-      "created_at": {
-        "type": "string",
-        "title": "Created At",
-        "format": "date-time"
-      },
-      "updated_at": {
-        "type": "string",
-        "title": "Updated At",
-        "format": "date-time"
-      },
-      "description": {
-        "type": "string",
-        "title": "Description"
-      }
-    },
-    "required": []
-  },
-  "mirrorProperties": {},
-  "calculationProperties": {},
-  "aggregationProperties": {},
-  "relations": {}
-}
-```
-
-**Blueprint 3: Zendesk Organization**
-
-```json
-{
-  "identifier": "zendesk_organization",
-  "title": "Zendesk Organization",
-  "icon": "TwoUsers",
-  "schema": {
-    "properties": {
-      "url": {
-        "type": "string",
-        "title": "URL",
-        "format": "url"
-      },
-      "created_at": {
-        "type": "string",
-        "title": "Created At",
-        "format": "date-time"
-      },
-      "updated_at": {
-        "type": "string",
-        "title": "Updated At",
-        "format": "date-time"
-      }
-    },
-    "required": []
-  },
-  "mirrorProperties": {},
-  "calculationProperties": {},
-  "aggregationProperties": {},
-  "relations": {}
-}
-```
-
-✅ **Checkpoint**: You should now have 3 blueprints created: "Zendesk User", "Zendesk Ticket", and "Zendesk Organization"
+✅ **Checkpoint**: You should now have 1 blueprint created: "Zendesk User"
 
 ---
 
@@ -339,40 +251,6 @@ resources:
             profile_url: .photo.content_url
             active: .active
             verified: .verified
-  - kind: /api/v2/tickets.json
-    selector:
-      query: 'true'
-      method: GET
-      data_path: .tickets
-    port:
-      entity:
-        mappings:
-          identifier: .id | tostring
-          title: .subject
-          blueprint: '"zendesk_ticket"'
-          properties:
-            status: .status
-            priority: .priority
-            requester_id: .requester_id | tostring
-            url: .url
-            created_at: .created_at
-            updated_at: .updated_at
-            description: .description
-  - kind: /api/v2/organizations.json
-    selector:
-      query: 'true'
-      method: GET
-      data_path: .organizations
-    port:
-      entity:
-        mappings:
-          identifier: .id | tostring
-          title: .name
-          blueprint: '"zendesk_organization"'
-          properties:
-            url: .url
-            created_at: .created_at
-            updated_at: .updated_at
 ```
 
 **How the mapping translates to HTTP requests:**
@@ -413,6 +291,8 @@ Port then:
 2. Applies the JQ mappings to create Port entities (e.g., `identifier: .id | tostring`, `title: .name`)
 3. Uses pagination config to fetch more pages if `meta.after_cursor` exists
 
+> **Note**: This exercise focuses on syncing Zendesk users only. Tickets and organizations are not included in this simplified mapping.
+
 **Understanding Ocean Custom-specific fields:**
 - `kind`: **This is the API endpoint path itself** (e.g., `/api/v2/users.json`). Each endpoint is tracked separately in Port's UI.
 - `data_path`: **JQ expression to extract the data array** from the API response. 
@@ -444,7 +324,7 @@ For advanced configurations like API Key Auth, Offset/Page Pagination, Dynamic P
 
 ## 6. Verify the Integration
 
-Go to Port's catalog and check if data is synced in. You should see Zendesk users, tickets, and organizations appearing as entities.
+Go to Port's catalog and check if data is synced in. You should see Zendesk users appearing as entities.
 
 ---
 
@@ -501,7 +381,7 @@ kubectl describe pod -l app.kubernetes.io/instance=zendesk-integration -n worksh
 1. Check integration status in Port UI → Data Sources → zendesk-integration
 2. Verify blueprints are created correctly
 3. Verify the `blueprint` field in your mapping
-4. Check `data_path` - Zendesk API wraps responses, so you need `data_path: .users` for users, `.tickets` for tickets, `.organizations` for organizations
+4. Check `data_path` - Zendesk API wraps responses, so you need `data_path: .users` for users
 
 ### Issue: Authentication errors
 
