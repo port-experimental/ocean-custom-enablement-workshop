@@ -9,13 +9,12 @@
 
 **What problem does this integration solve?**
 
-Integrating Zendesk with Port allows you to visualize your customer support structure, track ticket status, and understand support team organization. This is particularly useful for understanding customer support workflows, ticket volumes, and team performance.
+Integrating Zendesk with Port allows you to visualize your customer support team structure and understand support team organization. This is particularly useful for understanding team composition, user roles, and team performance.
 
 **Example scenarios:**
-- Track ticket status and priority across your support team
 - Monitor support team organization and user roles
-- Understand customer support patterns and ticket volumes
-- Identify high-priority issues and their resolution times
+- Track active support team members
+- Understand team composition and structure
 
 ---
 
@@ -337,8 +336,8 @@ Go to Port's catalog and check if data is synced in. You should see Zendesk user
 Browse the [Zendesk API documentation](https://developer.zendesk.com/api-reference) and find another endpoint you'd like to sync.
 
 **Example endpoints to consider:**
-- `/api/v2/tickets/{ticket_id}/comments.json` - Get comments for a specific ticket (requires path parameters)
 - `/api/v2/groups.json` - Get support groups
+- `/api/v2/organizations.json` - Get customer organizations
 - `/api/v2/satisfaction_ratings.json` - Get customer satisfaction ratings
 
 **Create a Blueprint (if needed):**

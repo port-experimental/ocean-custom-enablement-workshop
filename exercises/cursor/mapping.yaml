@@ -25,11 +25,11 @@ resources:
             composer_requests: .composerRequests // 0
             chat_requests: .chatRequests // 0
             agent_requests: .agentRequests // 0
-            total_input_tokens: null
-            total_output_tokens: null
-            total_cache_write_tokens: null
-            total_cache_read_tokens: null
-            total_cents: null
+            total_input_tokens: 0
+            total_output_tokens: 0
+            total_cache_write_tokens: 0
+            total_cache_read_tokens: 0
+            total_cents: 0
             most_used_model: .mostUsedModel // ""
-            total_active_users: null
+            total_active_users: 0
 

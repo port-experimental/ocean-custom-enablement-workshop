@@ -25,7 +25,7 @@ Integrating Cursor with Port allows you to track AI coding assistant usage metri
 
 - **Tool Name**: Cursor
 - **API Documentation**: [Cursor API](https://cursor.com/docs/api)
-- **Authentication Method**: Basic Auth (API Key as username, colon ":" as password)
+- **Authentication Method**: Basic Auth (API Key as username, colon ":" as password - Ocean Custom requires non-empty password)
 - **Base URL**: `https://api.cursor.com`
 
 **What data will we sync?**
@@ -147,7 +147,7 @@ helm install cursor-integration port-labs/port-ocean \
 - `integration.config.baseUrl` - Cursor API base URL
 - `integration.config.authType` - Authentication method (basic)
 - `integration.config.username` - Cursor API key (used as Basic Auth username)
-- `integration.config.password` - Colon ":" (Cursor API uses Basic Auth with empty password, but Ocean Custom requires a non-empty value)
+- `integration.config.password` - Colon ":" (Cursor API accepts empty password, but Ocean Custom requires a non-empty value, so we use ":")
 - `integration.config.paginationType` - No pagination (none)
 - `integration.eventListener.type=POLLING` - Polling mode (required for Ocean Custom)
 - `scheduledResyncInterval=120` - Resync every 120 minutes (2 hours)
@@ -336,8 +336,8 @@ Authorization: Basic <base64-encoded-api-key:>
 Content-Type: application/json
 
 {
-  "startDate": 1680000000000,
-  "endDate": 1702592000000
+  "startDate": 1760961357000,
+  "endDate": 1763553357000
 }
 ```
 
@@ -462,7 +462,7 @@ kubectl describe pod -l app.kubernetes.io/instance=cursor-integration -n worksho
 
 - Verify Cursor API key is correct
 - Check that your API key has access to the organization data you're trying to sync
-- Ensure Basic Auth is configured correctly (`authType=basic`, `username` set to API key, `password` set to `":"`)
+- Ensure Basic Auth is configured correctly (`authType=basic`, `username` set to API key, `password` set to `":"` - Ocean Custom requires non-empty password)
 
 ### Issue: POST request errors
 
