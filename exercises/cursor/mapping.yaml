@@ -1,0 +1,35 @@
+resources:
+  - kind: /teams/daily-usage-data
+    selector:
+      query: 'true'
+      method: POST
+      body: '{"startDate": ((now | floor) - (86400 * 30)) * 1000, "endDate": (now | floor) * 1000}'
+      data_path: .data
+    port:
+      entity:
+        mappings:
+          identifier: .userId + "@" + .day
+          title: .email + " usage " + .day
+          blueprint: '"cursor_usage_record"'
+          properties:
+            record_date: .day + "T00:00:00Z"
+            org: (.email | split("@")[1]) // "unknown"
+            total_accepts: .totalAccepts // 0
+            total_rejects: .totalRejects // 0
+            total_tabs_shown: .totalTabsShown // 0
+            total_tabs_accepted: .totalTabsAccepted // 0
+            total_lines_added: .totalLinesAdded // 0
+            total_lines_deleted: .totalLinesDeleted // 0
+            accepted_lines_added: .acceptedLinesAdded // 0
+            accepted_lines_deleted: .acceptedLinesDeleted // 0
+            composer_requests: .composerRequests // 0
+            chat_requests: .chatRequests // 0
+            agent_requests: .agentRequests // 0
+            total_input_tokens: null
+            total_output_tokens: null
+            total_cache_write_tokens: null
+            total_cache_read_tokens: null
+            total_cents: null
+            most_used_model: .mostUsedModel // ""
+            total_active_users: null
+

@@ -336,7 +336,7 @@ Authorization: Basic <base64-encoded-api-key:>
 Content-Type: application/json
 
 {
-  "startDate": 1700000000000,
+  "startDate": 1680000000000,
   "endDate": 1702592000000
 }
 ```
@@ -378,7 +378,7 @@ Port then:
 **Understanding Ocean Custom-specific fields:**
 - `kind`: **This is the API endpoint path itself** (e.g., `/teams/daily-usage-data`). Each endpoint is tracked separately in Port's UI.
 - `method: POST` - **Cursor uses POST requests** with a JSON body (unlike GET requests in other examples)
-- `body`: **JQ expression to generate the request body** - calculates date range dynamically
+- `body`: **JQ expression to generate the request body** - calculates date range dynamically (30 days back from now, which is the API maximum)
 - `data_path`: **JQ expression to extract the data array** from the API response
 - **Field mapping**: The API returns camelCase fields (e.g., `totalAccepts`), which are mapped to snake_case blueprint properties (e.g., `total_accepts`)
 - **Default values**: Uses `//` operator to provide defaults for missing/null values (e.g., `.totalAccepts // 0`)
