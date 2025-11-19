@@ -99,7 +99,7 @@ delete_port_integrations() {
     for integration in "${INTEGRATIONS[@]}"; do
         print_info "Deleting integration: ${integration}"
         local response=$(curl -s -w "\n%{http_code}" -X DELETE \
-            "${PORT_API_URL}/integrations/${integration}" \
+            "${PORT_API_URL}/v1/integration/${integration}" \
             -H "Authorization: Bearer ${token}")
         
         local http_code=$(echo "$response" | tail -n1)
