@@ -298,7 +298,7 @@ Click **"Add Resource"** or **"Edit Configuration"** and copy-paste this complet
 
 ```yaml
 resources:
-  - kind: /api/users.list
+  - kind: /users.list
     selector:
       query: 'true'
       method: GET
@@ -321,7 +321,7 @@ resources:
             status_emoji: .profile.status_emoji
             timezone: .tz
             profile_image: .profile.image_512
-  - kind: /api/conversations.list
+  - kind: /conversations.list
     selector:
       query: 'true'
       method: GET
@@ -350,7 +350,7 @@ resources:
 
 **How the mapping translates to HTTP requests:**
 
-Based on the first resource mapping (`/api/users.list`), Port will make this HTTP request:
+Based on the first resource mapping (`/users.list`), Port will make this HTTP request:
 
 ```http
 GET https://slack.com/api/users.list?limit=100
@@ -390,7 +390,7 @@ Port then:
 3. Uses pagination config to fetch more pages if `response_metadata.next_cursor` exists
 
 **Understanding Ocean Custom-specific fields:**
-- `kind`: **This is the API endpoint path itself** (e.g., `/api/users.list`). Each endpoint is tracked separately in Port's UI.
+- `kind`: **This is the API endpoint path itself** (e.g., `/users.list`). Each endpoint is tracked separately in Port's UI. Note: Since the base URL is `https://slack.com/api`, the kind should be `/users.list` (not `/api/users.list`) to avoid double `/api/api/` in the URL.
 - `data_path`: **JQ expression to extract the data array** from the API response. 
   
   **Why do we need this?** Slack API responses wrap data in objects. For example:
